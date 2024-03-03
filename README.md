@@ -1,5 +1,13 @@
 # CONFIG
 
+# Autores: 
+
+## 
+##
+##
+##
+## Estiven MC
+
 - python -m venv my_libs
 - Open PowerShell as Administrator:
 - Set-ExecutionPolicy RemoteSigned
@@ -27,4 +35,4 @@
 - "Python: Select Interpreter"
 - cmd:
 - python Ecuaciones_AN.py
-- python test.py
+
