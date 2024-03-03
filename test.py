@@ -1,125 +1,123 @@
+
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 import math
 
-
-def solve_quadratic_equation(a, b, c):
-    """Solve a quadratic equation."""
-    discriminant = b**2 - 4 * a * c
-    if discriminant < 0:
+# Función para calcular la raíz de una ecuación cuadrática
+def metodo_numerico(coeficiente_a, coeficiente_b, coeficiente_c):
+    discriminante = coeficiente_b ** 2 - 4 * coeficiente_a * coeficiente_c
+    if discriminante < 0:
         return None, None
     else:
-        x1 = (-b + math.sqrt(discriminant)) / (2 * a)
-        x2 = (-b - math.sqrt(discriminant)) / (2 * a)
+        x1 = (-coeficiente_b + math.sqrt(discriminante)) / (2 * coeficiente_a)
+        x2 = (-coeficiente_b - math.sqrt(discriminante)) / (2 * coeficiente_a)
         return x1, x2
 
+# Función para calcular f(x) con la fórmula de la ecuación
+def calcular_f(coeficiente_a, coeficiente_b, coeficiente_c, x):
+    return coeficiente_a * x ** 2 + coeficiente_b * x + coeficiente_c
 
-def calculate_f(a, b, c, x):
-    """Calculate the value of the quadratic function."""
-    return a * x**2 + b * x + c
-
-
-def bisection_method(a, b, c, tol=1e-6):
-    """Bisection method to find roots of a quadratic function."""
+# Funcion para calcular los resultados con el método de bisección
+def metodo_biseccion(coeficiente_a, coeficiente_b, coeficiente_c, limite_a, limite_b, tol=1e-6):
     results = []
-    iter_count = a
-    max_iter = b
-    while iter_count < max_iter:
+    contador_iteracion = limite_a
+    maxima_iteracion = limite_b
 
-        pm = (a + b) / 2
+    while contador_iteracion < maxima_iteracion:
+        pm = (limite_a + limite_b) / 2
+        f_pm = calcular_f(coeficiente_a, coeficiente_b, coeficiente_c, pm)
+        results.append((coeficiente_a, coeficiente_b, coeficiente_c, limite_a, limite_b, pm, f_pm))
 
-        f_pm = calculate_f(a, b, c, pm)
-
-        results.append((a, b, pm, f_pm))
-
-        if f_pm == 0 or (b - a) / 2 < tol:
+        if f_pm == 0 or (limite_b - limite_a) / 2 < tol:
             break
-        elif calculate_f(a, b, c, a) * f_pm < 0:
-            b = pm
+        elif calcular_f(coeficiente_a, coeficiente_b, coeficiente_c, limite_a) * f_pm < 0:
+            limite_b = pm
         else:
-            a = pm
-        iter_count += 1
+            limite_a = pm
+        contador_iteracion += 1
     return results
 
-
-def show_results(a, b, c, results):
-    """Display the results in a new window."""
+# Función para dar formato a los valores del método de bisección en una tabla
+def formato_tabla_biseccion(coeficiente_a, coeficiente_b, results):
     results_window = tk.Toplevel(root)
-    results_window.title("Bisection Method Results")
-
+    results_window.title("Resultados del Método de Bisección")
     tree = ttk.Treeview(results_window)
-    tree["columns"] = (
-        "Iteration",
-        "a",
-        "f(a)",
-        "Midpoint",
-        "f(Midpoint)",
-        "b",
-        "f(b)",
-        "Error %",
-    )
+    tree["columns"] = ("i", "a", "f(a)", "pm", "f(pm)", "b", "f(b)", "Error %")
     for column in tree["columns"]:
         tree.heading(column, text=column)
-
-    for i, (a_val, b_val, pm, f_pm) in enumerate(results):
-
-        f_a = calculate_f(a, b, c, a_val)
-        f_b = calculate_f(a, b, c, b_val)
-
-        error_percent = (
-            abs((pm - results[-2][2]) / results[-2][2]) * 100
-            if len(results) > 1 and results[-2][2] != 0
-            else 0
-        )
-
-        tree.insert(
-            "", "end", values=(i + 0, a_val, f_a, pm, f_pm, b_val, f_b, error_percent)
-        )
-
+    for i, (a, b, c, limite_a, limite_b, pm, f_pm) in enumerate(results):
+        f_a = calcular_f(a, b, c, limite_a)
+        f_b = calcular_f(a, b, c, limite_b)
+        error_percent = abs(pm - results[-2][5]) / results[-2][5] * 100
+        tree.insert("", "end", values=(i + 1, limite_a, f_a, pm, f_pm, limite_b, f_b, error_percent))
     tree.pack(fill="both", expand=True)
 
-
-def calculate_and_show_results():
-    """Calculate roots and show results."""
+# Función para dar formato a los valores del método numérico en un label
+def formato_metodo_numerico():
     try:
-        a = float(entry_a.get())
-        b = float(entry_b.get())
-        c = float(entry_c.get())
-
-        x1, x2 = solve_quadratic_equation(a, b, c)
-
+        coeficiente_a = float(valor_a.get())
+        coeficiente_b = float(valor_b.get())
+        coeficiente_c = float(valor_c.get())
+        x1, x2 = metodo_numerico(coeficiente_a, coeficiente_b, coeficiente_c)
         if x1 is None:
-            messagebox.showerror("Error", "No real roots.")
+            messagebox.showerror("Error", "No hay solución real!")
         else:
-            result_label.config(text=f"x1 = {x1:.6f}, x2 = {x2:.6f}")
-            results = bisection_method(a, b, c)
-            show_results(a, b, c, results)
+            resultado_numerico.config(text=f"x1 = {x1:.6f}, x2 = {x2:.6f}")
     except ValueError:
-        messagebox.showerror("Error", "Please enter valid numeric coefficients.")
+        messagebox.showerror("Error", "Ingrese coeficientes válidos!")
 
+# Función para dar formato a los valores del método de bisección desde una tabla
+def formato_metodo_biseccion():
+    try:
+        coeficiente_a = float(valor_a.get())
+        coeficiente_b = float(valor_b.get())
+        coeficiente_c = float(valor_c.get())
+        limite_a = float(a_limite.get())
+        limite_b = float(b_limite.get())
+        results = metodo_biseccion(coeficiente_a, coeficiente_b, coeficiente_c, limite_a, limite_b)
+        formato_tabla_biseccion(coeficiente_a, coeficiente_b, results)
+    except ValueError:
+        messagebox.showerror("Error", "Los coeficientes ingresados no son válidos!")
 
+# Crear la Interfaz
 root = tk.Tk()
-root.title("Quadratic Equation Solver")
+root.title("Ecuaciones - Análisis Numérico")
 
-# Coefficient entries
-entry_a = ttk.Entry(root)
-entry_a.grid(row=0, column=1, padx=5, pady=5)
-entry_b = ttk.Entry(root)
-entry_b.grid(row=0, column=3, padx=5, pady=5)
-entry_c = ttk.Entry(root)
-entry_c.grid(row=0, column=5, padx=5, pady=5)
+# Campos de Entrada de Valores de los Coeficientes
+valor_a = ttk.Entry(root)
+valor_a.grid(row=0, column=1, padx=5, pady=5)
+valor_b = ttk.Entry(root)
+valor_b.grid(row=0, column=3, padx=5, pady=5)
+valor_c = ttk.Entry(root)
+valor_c.grid(row=0, column=5, padx=5, pady=5)
 
-# Coefficient labels
-ttk.Label(root, text="x^2 +").grid(row=0, column=0, padx=5, pady=5)
-ttk.Label(root, text="x +").grid(row=0, column=2, padx=5, pady=5)
-ttk.Label(root, text="= 0").grid(row=0, column=4, padx=5, pady=5)
+# Etiquetas de los Campos de Entrada de Valores
+ttk.Label(root, text="x^2 +").grid(row=0, column=2, padx=5, pady=5)
+ttk.Label(root, text="x +").grid(row=0, column=4, padx=5, pady=5)
+ttk.Label(root, text="= 0").grid(row=0, column=6, padx=5, pady=5)
 
-# Solve button
-solve_button = ttk.Button(root, text="Solve", command=calculate_and_show_results)
-solve_button.grid(row=1, column=0, columnspan=6, pady=10)
+# Campos de Entrada de Valores de los Límites de la Iteración
+a_limite = ttk.Entry(root)
+a_limite.grid(row=3, column=1, padx=5, pady=5)
+b_limite = ttk.Entry(root)
+b_limite.grid(row=3, column=3, padx=5, pady=5)
 
-# Result label
-result_label = ttk.Label(root, text="", font=("Arial", 12, "bold"))
-result_label.grid(row=2, column=0, columnspan=6)
+# Etiquetas de los Campos de Entrada de Límites de Iteración
+ttk.Label(root, text="xi").grid(row=3, column=2, padx=5, pady=5)
+ttk.Label(root, text="xu").grid(row=3, column=4, padx=5, pady=5)
 
+# Ejecutar Método Numérico
+btnMetodoNumerico = ttk.Button(root, text="Método Numérico", command=formato_metodo_numerico)
+btnMetodoNumerico.grid(row=1, column=0, columnspan=2, pady=10)
+
+# Ejecutar Método Bisección
+btnMetodoBiseccion = ttk.Button(root, text="Método Bisección", command=formato_metodo_biseccion)
+btnMetodoBiseccion.grid(row=4, column=2, columnspan=2, pady=10)
+
+# Mostrar resultado del método numérico al ejecutar btnMetodoNumerico
+resultado_numerico = ttk.Label(root, text="", font=("Arial", 12, "bold"))
+resultado_numerico.grid(row=2, column=0, columnspan=6)
+
+# Mostrar Resultados
 root.mainloop()
