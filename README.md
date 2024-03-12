@@ -6,7 +6,7 @@
 ##
 ##
 ##
-## Estiven MC
+## Estiven Morelos Cabarcas
 
 - python -m venv my_libs
 - Open PowerShell as Administrator:
