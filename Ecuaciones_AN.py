@@ -54,7 +54,7 @@ def formato_metodo_grafico():
 
 
 # Funcion para calcular los resultados con el Metodo de Biseccion
-def metodo_biseccion(a, b, c, limite_a, limite_b, maxima_iteracion):
+def valores_metodo_biseccion(a, b, c, limite_a, limite_b, maxima_iteracion):
     contador_iteracion = 0
     results = []
     if calcular_f(a, b, c, limite_a) * calcular_f(a, b, c, limite_b) > 0:
@@ -122,15 +122,99 @@ def metodo_biseccion():
 
         maxima_iteracion = int(max_iteracion.get())
 
-        results = metodo_biseccion(a, b, c, limite_a, limite_b, maxima_iteracion)
+        results = valores_metodo_biseccion(a, b, c, limite_a, limite_b, maxima_iteracion)
         if results:
             formato_tabla_biseccion(limite_a, limite_b, results)
     except ValueError:
         messagebox.showerror(
             "Error", "Los coeficientes ingresados no son números validos!"
         )
+        
+        
+        # Funcion para calcular los resultados con el Metodo de Falsa Posicion
+def valores_metodo_falsa_posicion(a, b, c, limite_a, limite_b, maxima_iteracion):
+    contador_iteracion = 0
+    results = []
+    if calcular_f(a, b, c, limite_a) * calcular_f(a, b, c, limite_b) > 0:
+        messagebox.showerror("Error", "No hay cambio de signo en el intervalo dado.")
+        return []
 
+    while contador_iteracion < maxima_iteracion:
+        results.append((a, b, c, limite_a, limite_b))
+        
+        f_xl = calcular_f(a, b, c, limite_a)
+        f_xu = calcular_f(a, b, c, limite_b)
+        xr = limite_b - (f_xu * (limite_a - limite_b) / (f_xl - f_xu))
+        f_xr = calcular_f(a, b, c, 2)
+        
+        if calcular_f(a, b, c, limite_a) * f_xr > 0:
+            limite_a = xr
+        else:
+            limite_a = limite_a
+        if calcular_f(a, b, c, xr) * f_xu < 0:
+            limite_b = limite_b
+        else:
+            limite_b = xr 
+        contador_iteracion += 1
+    return results
 
+        
+# Funcion para dar formato a los valores del metodo de Falsa Posicion en una tabla
+def formato_tabla_falsa_posicion(limite_a, limite_b, results):
+    results_window = tk.Toplevel(root)
+    results_window.title("Resultados de Metodo de Falsa Posicion")
+    tree = ttk.Treeview(results_window)
+    tree["columns"] = (
+        "iteracion",
+        "xl",
+        "f(xl)",
+        "xu",
+        "f(xu)",
+        "xr",
+        "f(xr)",
+        "Error %",
+    )
+    for column in tree["columns"]:
+        tree.heading(column, text=column)
+    for i, (a, b, c, limite_a, f_xl, limite_b , f_xu , xr , f_xr ) in enumerate(results):
+        
+        porcentaje_error_aproximado = 0 
+    
+        # Calcular el porcentaje de error usando el punto medio actual y el anterior
+        ## if i > 0:
+        ##    porcentaje_error_aproximado = abs((pm - results[i - 1][5]) / pm) * 100
+        ## else:
+           ##porcentaje_error_aproximado = 0  # No hay error en la primera iteración
+           
+        tree.insert(
+            "",
+            "end",
+            values=(i + 1, limite_a, f_xl, limite_b, f_xu, xr, f_xr ,f"{porcentaje_error_aproximado:.2f}"),
+        )
+    tree.pack(fill="both", expand=True)
+
+        
+def metodo_falsa_posicion ():
+    try:
+        a = float(valor_a.get())
+        b = float(valor_b.get())
+        c = float(valor_c.get())
+        
+        limite_a = float(a_limite.get())
+        limite_b = float(b_limite.get())
+        maxima_iteracion = int(max_iteracion.get())
+        
+        results = valores_metodo_falsa_posicion(a, b, c, limite_a, limite_b, maxima_iteracion)
+        if results:
+            formato_tabla_falsa_posicion(limite_a, limite_b, results)
+    except ValueError:
+        messagebox.showerror(
+        "Error", "Los coeficientes ingresados no son números validos!"
+     )            
+                
+                
+                
+            
 # Crear la Interfaz
 root = tk.Tk()
 root.title("Ecuaciones Analisis Cuadratico")
@@ -182,6 +266,12 @@ btnMetodoBiseccion = ttk.Button(
     root, text="Metodo Biseccion", command=metodo_biseccion
 )
 btnMetodoBiseccion.grid(row=5, column=2, columnspan=2, pady=10)
+
+# Ejecutar Metodo Falsa Posicion
+btnMetodoFalsaPosicion = ttk.Button(
+    root, text="Metodo Falsa Posicion", command=metodo_falsa_posicion
+)
+btnMetodoFalsaPosicion.grid(row=5, column=4, columnspan=2, pady=10)
 
 # Mostrar resultado del metodo Cuadratico al ejecutar btnMetodoCuadratico
 resultado_cuadratico = ttk.Label(root, text="", font=("Arial", 12, "bold"))
