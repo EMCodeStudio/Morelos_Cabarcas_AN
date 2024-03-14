@@ -81,7 +81,7 @@ def formato_tabla_biseccion(limite_a, limite_b, results):
     results_window.title("Resultados de Metodo de Biseccion")
     tree = ttk.Treeview(results_window)
     tree["columns"] = (
-        "i",
+        "iteracion",
         "a",
         "f(a)",
         "pm",
@@ -144,7 +144,8 @@ def metodo_biseccion():
 
 # Funcion para calcular f con la formula de la Ecuacion
 def calcular_f_falsa_posicion(x):
-    return -25 + 82 * x - 90 * x**2 + 44 * x**3 - 8 * x**4 + 0.7 * x**5
+    return x**10-1
+    ## return -25 + 82 * x - 90 * x**2 + 44 * x**3 - 8 * x**4 + 0.7 * x**5
     print("Valores de x: " + x)
 
 
@@ -180,49 +181,6 @@ def valores_metodo_falsa_posicion(limite_xl, limite_xu, maxima_iteracion):
     return results
 
 
-# Funcion para dar formato a los valores del metodo de Falsa Posicion en una tabla
-"""def formato_tabla_falsa_posicion(limite_a, limite_b, results):
-    results_window = tk.Toplevel(root)
-    results_window.title("Resultados de Metodo de Falsa Posicion")
-    tree = ttk.Treeview(results_window) 
-    tree["columns"] = (
-        "iteracion",
-        "xl",
-        "f(xl)",
-        "xu",
-        "f(xu)",
-        "xr",
-        "f(xr)",
-        "Error a%",
-    )
-    for column in tree["columns"]:
-        tree.heading(column, text=column)
-    for i, (limite_xl, f_xl, limite_xu, f_xu, xr, f_xr) in enumerate(results):
-        print("ORIGINAL XU", limite_xu)
-        # Calcular el porcentaje de error usando el punto medio actual y el anterior
-        if i > 0:
-            porcentaje_error_aproximado = (
-                abs((limite_xu - results[i - 2][4]) / limite_xu) * 100
-            )
-            print("XU", limite_xu)
-            print("POSICIONES", results[i - 2][4])
-        else:
-            porcentaje_error_aproximado = 0  # No hay error en la primera iteración
-        tree.insert(
-            "",
-            "end",
-            values=(
-                i + 1,
-                limite_xl,  # XL
-                f_xl,
-                limite_xu,  # XU
-                f_xu,
-                xr,
-                f_xr,
-                f"{porcentaje_error_aproximado:.2f}",
-            ),
-        )
-    tree.pack(fill="both", expand=True)"""
 
 
 def formato_tabla_falsa_posicion(limite_a, limite_b, results):
@@ -237,7 +195,7 @@ def formato_tabla_falsa_posicion(limite_a, limite_b, results):
         "f(xu)",
         "xr",
         "f(xr)",
-        "Error a%",
+        "Error %",
     )
     for column in tree["columns"]:
         tree.heading(column, text=column)
@@ -245,8 +203,10 @@ def formato_tabla_falsa_posicion(limite_a, limite_b, results):
         # Calcular el porcentaje de error usando los valores actuales y anteriores de xu
         if i > 0:
             porcentaje_error_aproximado = (
-                abs((limite_xu - results[i - 1][2]) / limite_xu) * 100
+                abs((xr - results[i - 1][4]) / xr) * 100
             )
+            print("XU", xr)
+            print("POSICIONES", results[i - 1][4])
         else:
             porcentaje_error_aproximado = 0  # No hay error en la primera iteración
         tree.insert(
@@ -269,7 +229,6 @@ def formato_tabla_falsa_posicion(limite_a, limite_b, results):
 
 def metodo_falsa_posicion():
     try:
-
         limite_a = float(a_limite.get())
         limite_b = float(b_limite.get())
         maxima_iteracion = int(max_iteracion.get())

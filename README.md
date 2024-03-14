@@ -8,15 +8,16 @@
 ##
 ## Estiven Morelos Cabarcas
 
+- program python install
+- plugin en vscode
 - python -m venv my_libs
 - Open PowerShell as Administrator:
-- Set-ExecutionPolicy RemoteSigned
+- Set-ExecutionPolicy RemoteSigned , S
 - VSCODE TERMINAL:
-- python.exe -m pip install --upgrade pip
-- .\my_libs\Scripts\activate
+- .\my_libs\Scripts\activate , en terminal vscode
 
 # INSTALL TKINTER
-
+- python.exe -m pip install --upgrade pip
 - pip install tk
 
 # INSTALL MATPLOTLIB
